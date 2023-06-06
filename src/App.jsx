@@ -40,14 +40,26 @@ function App() {
     backgroundImage: 'url(/img/background.svg)',
   }
 
+  function addElementToRandomPlace(array, element) {
+    let randomIndex = Math.floor(Math.random() * array.length)
+    array.splice(randomIndex, 0, element)
+    return array
+  }
+
   const quizzicalQuestions = questions.map((question, index) => (
     <Questions
       key={index}
+      all={question}
       question={question.question}
-      wrongAnswers={question.incorrect_answers}
+      wrongAnswer={question.incorrect_answers}
       rightAnswer={question.correct_answer}
       allAnswers={[...question.incorrect_answers, question.correct_answer]}
+      randomAnswers={addElementToRandomPlace(
+        question.incorrect_answers,
+        question.correct_answer
+      )}
       styles={styles}
+      selectedAnswer={''}
     />
   ))
 
@@ -113,7 +125,7 @@ function App() {
             </div>
             <div>
               <label className='label' htmlFor='difficulty'>
-                {/* Select Category: */}
+                {/* Select Difficulty: */}
               </label>
               <select
                 name='difficulty'
@@ -129,7 +141,7 @@ function App() {
             </div>
             <div>
               <label className='label' htmlFor='type'>
-                {/* Select Category: */}
+                {/* Select Type: */}
               </label>
               <select
                 name='type'
@@ -153,7 +165,7 @@ function App() {
           className='bg-[#F5F7FB] flex flex-col justify-center items-center bg-no-repeat bg-center bg-cover font-karla min-h-screen'
         >
           <div>{quizzicalQuestions}</div>
-          <button className='bg-[#4D5B9E] p-3 rounded-xl mt-8 text-white cursor-pointer'>
+          <button className='bg-[#4D5B9E] p-3 rounded-xl mt-8 text-white cursor-pointer mb-8'>
             Check answers
           </button>
         </div>

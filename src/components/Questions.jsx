@@ -2,98 +2,67 @@ import React from 'react'
 import { decode } from 'html-entities'
 
 export default function Questions(props) {
-  const [formData, setFormData] = React.useState({
-    employment: '',
-  })
-  const [isClicked, setIsClicked] = React.useState(false)
+  // console.log(props)
+  const [selected, setSelected] = React.useState(false)
+  const [items, setItems] = React.useState(props.all)
 
-  function handleChange(event) {
-    const { name, value, checked, type } = event.target
+  function selectAnswer(id, answer) {
+    // console.log(
+    //   `Question "${decode(
+    //     props.question
+    //   )}" with id of ${id} was clicked with the answer of "${answer}"`
+    // )
 
-    setFormData(prevState => ({
+    // if (answer === props.rightAnswer) {
+    //   console.log('correct!!!')
+    // } else {
+    //   console.log('Wrong!!!')
+    // }
+
+    setItems(prevState => ({
       ...prevState,
-      [name]: type === 'checkbox' ? checked : value,
+      selected: answer,
     }))
   }
 
-  const labelFocused = { backgroundColor: '#D6DBF5', border: 'none' }
+  console.log(items.selected)
+
+  const styles = { backgroundColor: '#D6DBF5', border: 'none' }
 
   return (
-    // The classnames on the labels repeat themselves 4 times make this code more DRY (Dont Repeat Yourself)
     <div className='flex flex-col justify-center mt-5 max-w-[900px] border-b-[1px] border-[#DBDEF0] p-5'>
-      <h1 className='text-[#293264] font-bold text-xl sm:text-2xl mb-1'>
+      <h1 className='text-[#293264] font-bold text-xl sm:text-2xl mb-2'>
         {decode(props.question)}
       </h1>
-      <div className='flex'>
-        <div className=''>{decode(props.allAnswers)}</div>
-        {/* <form action=''>
-          <div className='flex mt-2 radio'>
-            <input
-              onChange={handleChange}
-              checked={formData.employment === 'choice1'}
-              id='choice1'
-              value='1'
-              type='radio'
-              name='employment'
-              className='hidden'
-            />
-            <label
-              className='bg-white p-3 border-[1px] border-[#293264] rounded-xl min-h-[40px] flex justify-center items-center mr-5 min-w-[100px]'
-              htmlFor='choice1'
-            >
-              {decode(props.allAnswers[0])}
-            </label>
-            <br />
-            <input
-              checked={formData.employment === 'choice2'}
-              onChange={handleChange}
-              id='choice2'
-              value='2'
-              type='radio'
-              name='employment'
-              className='hidden'
-            />
-            <label
-              className='bg-white p-3 border-[1px] border-[#293264] rounded-xl min-h-[40px] flex justify-center items-center mr-5 min-w-[100px]'
-              htmlFor='choice2'
-            >
-              {decode(props.allAnswers[1])}
-            </label>
-            <br />
-            <input
-              onChange={handleChange}
-              checked={formData.employment === 'choice3'}
-              value='3'
-              id='choice3'
-              type='radio'
-              name='employment'
-              className='hidden'
-            />
-            <label
-              className='bg-white p-3 border-[1px] border-[#293264] rounded-xl min-h-[40px] flex justify-center items-center mr-5 min-w-[100px]'
-              htmlFor='choice3'
-            >
-              {decode(props.allAnswers[2])}
-            </label>
-            <br />
-            <input
-              onChange={handleChange}
-              checked={formData.employment === 'choice4'}
-              value='4'
-              id='choice4'
-              type='radio'
-              name='employment'
-              className='hidden'
-            />
-
-            <label
-              className='bg-white p-3 border-[1px] border-[#293264] rounded-xl min-h-[40px] min-w-[100px] flex justify-center items-center mr-5'
-              htmlFor='choice4'
-            >
-              {decode(props.allAnswers[3])}
-            </label>
-          </div>
-        </form> */}
+      <div className='flex gap-5'>
+        <div
+          style={items.selected === props.randomAnswers[0] ? styles : null}
+          onClick={() => selectAnswer(1, props.randomAnswers[0])}
+          className='flex bg-slate-500 cursor-pointer'
+        >
+          {decode(props.randomAnswers[0])}
+        </div>
+        <div
+          style={items.selected === props.randomAnswers[1] ? styles : null}
+          onClick={() => selectAnswer(2, props.randomAnswers[1])}
+          className='flex bg-slate-500 cursor-pointer'
+        >
+          {decode(props.randomAnswers[1])}
+        </div>
+        <div
+          style={items.selected === props.randomAnswers[2] ? styles : null}
+          onClick={() => selectAnswer(3, props.randomAnswers[2])}
+          className='flex bg-slate-500 cursor-pointer'
+        >
+          {decode(props.randomAnswers[2])}
+        </div>
+        <div
+          style={items.selected === props.randomAnswers[3] ? styles : null}
+          onClick={() => selectAnswer(4, props.randomAnswers[3])}
+          className='flex bg-slate-500 cursor-pointer'
+        >
+          {decode(props.randomAnswers[3])}
+        </div>
       </div>
     </div>
   )
