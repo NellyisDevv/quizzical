@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Questions from './components/Questions.jsx'
 
-function App() {
+function App(props) {
   const [startGame, setStartGame] = React.useState(true)
   const [formData, setFormData] = React.useState({
     amount: '',
