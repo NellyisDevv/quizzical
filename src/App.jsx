@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import Questions from './components/Questions.jsx'
+import { nanoid } from 'nanoid'
 
-function App(props) {
+function App() {
   const [startGame, setStartGame] = React.useState(true)
   const [formData, setFormData] = React.useState({
     amount: '',
@@ -10,6 +11,12 @@ function App(props) {
     type: '',
   })
   const [questions, setQuestions] = React.useState([])
+  const [correct, setCorrect] = React.useState()
+  const [endGame, setEndGame] = React.useState(false)
+
+  const styles = {
+    backgroundImage: 'url(/img/background.svg)',
+  }
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -19,6 +26,8 @@ function App(props) {
       [name]: value,
     }))
   }
+
+  const shuffleArray = arr => arr.sort(() => Math.random() - 0.5)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -32,36 +41,72 @@ function App(props) {
     )
 
     let data = await res.json()
-    setQuestions(data.results)
-    setStartGame(false)
+    let allQuestions = []
+    data.results.forEach(question => {
+      allQuestions.push({
+        id: nanoid(),
+        answers: shuffleArray([
+          ...question.incorrect_answers,
+          question.correct_answer,
+        ]),
+        question: question.question,
+        correct: question.correct_answer,
+        selected: null,
+        checked: false,
+      })
+    })
+    setQuestions(allQuestions)
+    setStartGame(!startGame)
   }
 
-  const styles = {
-    backgroundImage: 'url(/img/background.svg)',
+  function handleClickAnswer(id, answer) {
+    setQuestions(prevState =>
+      prevState.map(question => {
+        return question.id === id ? { ...question, selected: answer } : question
+      })
+    )
   }
 
-  function addElementToRandomPlace(array, element) {
-    let randomIndex = Math.floor(Math.random() * array.length)
-    array.splice(randomIndex, 0, element)
-    return array
+  questions.map(question => console.log(question.correct))
+
+  // console.log(correct)
+
+  function checkAnswers() {
+    setQuestions(prevState =>
+      prevState.map(prevState =>
+        prevState.selected === prevState.correct
+          ? { ...prevState, check: true }
+          : { ...prevState, check: false }
+      )
+    )
+
+    let correct = 0
+    questions.forEach(question => {
+      if (question.correct === question.selected) {
+        correct += 1
+      }
+    })
+
+    setCorrect(correct)
+
+    setEndGame(true)
   }
 
-  const quizzicalQuestions = questions.map((question, index) => (
-    <Questions
-      key={index}
-      all={question}
-      question={question.question}
-      wrongAnswer={question.incorrect_answers}
-      rightAnswer={question.correct_answer}
-      allAnswers={[...question.incorrect_answers, question.correct_answer]}
-      randomAnswers={addElementToRandomPlace(
-        question.incorrect_answers,
-        question.correct_answer
-      )}
-      styles={styles}
-      selectedAnswer={''}
-    />
-  ))
+  function newGame() {
+    location.reload()
+  }
+
+  const questionElements = questions
+    ? questions.map(question => (
+        <Questions
+          key={question.id}
+          question={question}
+          id={question.id}
+          handleClickAnswer={handleClickAnswer}
+          endGame={endGame}
+        />
+      ))
+    : []
 
   return (
     <div>
@@ -164,10 +209,26 @@ function App(props) {
           style={styles}
           className='bg-[#F5F7FB] flex flex-col justify-center items-center bg-no-repeat bg-center bg-cover font-karla min-h-screen'
         >
-          <div>{quizzicalQuestions}</div>
-          <button className='bg-[#4D5B9E] p-3 rounded-xl mt-8 text-white cursor-pointer mb-8'>
-            Check answers
-          </button>
+          <div>{questionElements}</div>
+
+          {!endGame ? (
+            <button
+              onClick={checkAnswers}
+              className='bg-[#4D5B9E] p-3 rounded-xl mt-8 text-white cursor-pointer mb-8'
+            >
+              Check answers
+            </button>
+          ) : (
+            <div className='flex justify-center items-center gap-4'>
+              <p className='font-bold text-xl'>{`You scored ${correct}/5 correct answers`}</p>
+              <button
+                onClick={newGame}
+                className='bg-[#4D5B9E] p-3 rounded-xl mt-8 text-white cursor-pointer mb-8'
+              >
+                Play again
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -175,11 +236,3 @@ function App(props) {
 }
 
 export default App
-
-// React.useEffect(() => {
-//   fetch(
-//     'https://opentdb.com/api.php?amount=10&category=15&difficulty=easy&type=multiple'
-//   )
-//     .then(res => res.json())
-//     .then(questions => console.log(questions))
-// }, [startGame])
