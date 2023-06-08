@@ -2,32 +2,42 @@ import React from 'react'
 import { decode } from 'html-entities'
 
 export default function Questions(props) {
-  // console.log(props)
-  // console.log(props.question.answers[0])
   console.log(props.question.selected)
-  // console.log(props.question.correct)
-  // console.log(props.question.check)
-  // console.log(props.question.answers[0])
+  const [answers, setAnswers] = React.useState()
   const styles = { backgroundColor: '#D6DBF5', border: 'none' }
   const correctAnswers = { backgroundColor: '#94D7A2', border: 'none' }
   const wrongAnswers = { backgroundColor: '#F8BCBC', border: 'none' }
+
+  function clickSelections() {
+    if (props.question.selected === props.question.answers[0]) {
+      return styles
+    } else {
+      return null
+    }
+  }
+
+  function checkSelections() {
+    if (props.question.answers[0] === props.question.correct) {
+      return correctAnswers
+    } else {
+      return null
+    }
+  }
 
   return (
     <div className='flex flex-col justify-center mt-5 max-w-[900px] border-b-[1px] border-[#DBDEF0] p-5'>
       <h1 className='text-[#293264] font-bold text-xl sm:text-2xl mb-2'>
         {decode(props.question.question)}
       </h1>
+      {/* <div>{props.question.answers}</div> */}
       <div className='flex gap-5'>
         <div
-          style={
-            !props.endGame
-              ? props.question.selected === props.question.answers[0]
-                ? styles
-                : null
-              : props.question.answers[0] === props.question.correct
-              ? correctAnswers
-              : null
-          }
+          // style={
+          //   props.question.selected === props.question.answers[0]
+          //     ? styles
+          //     : null
+          // }
+          style={!props.endGame ? clickSelections() : checkSelections()}
           onClick={() =>
             props.handleClickAnswer(props.id, props.question.answers[0])
           }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Questions from './components/Questions.jsx'
 import { nanoid } from 'nanoid'
+import Confetti from 'react-confetti'
 
 function App() {
   const [startGame, setStartGame] = React.useState(true)
@@ -52,7 +53,6 @@ function App() {
         question: question.question,
         correct: question.correct_answer,
         selected: null,
-        checked: false,
       })
     })
     setQuestions(allQuestions)
@@ -67,17 +67,23 @@ function App() {
     )
   }
 
-  questions.map(question => console.log(question.correct))
-
-  // console.log(correct)
-
   function checkAnswers() {
+    // setQuestions(prevState =>
+    //   prevState.map(prevState =>
+    //     prevState.selected === prevState.correct
+    //       ? { ...prevState, isCheckedTrue: true }
+    //       : { ...prevState, isCheckedFalse: true }
+    //   )
+    // )
+
     setQuestions(prevState =>
-      prevState.map(prevState =>
-        prevState.selected === prevState.correct
-          ? { ...prevState, check: true }
-          : { ...prevState, check: false }
-      )
+      prevState.map(prevState => {
+        if (prevState.selected === prevState.correct) {
+          return { ...prevState, isCheckedTrue: true }
+        } else if (prevState.selected !== prevState.correct) {
+          return { ...prevState, isCheckedFalse: true }
+        }
+      })
     )
 
     let correct = 0
@@ -91,6 +97,8 @@ function App() {
 
     setEndGame(true)
   }
+
+  console.log(questions)
 
   function newGame() {
     location.reload()
@@ -108,6 +116,16 @@ function App() {
       ))
     : []
 
+  function getWindowDimensions() {
+    const { innerWidth: width, innerHeight: height } = window
+    return {
+      width,
+      height,
+    }
+  }
+
+  const fullWindow = getWindowDimensions()
+
   return (
     <div>
       {startGame ? (
@@ -123,7 +141,7 @@ function App() {
                 name='amount'
                 value={formData.amount}
                 onChange={handleChange}
-                min={5}
+                min={1}
                 max={20}
                 className='mt-1 p-4 flex rounded-xl w-[200px]'
                 type='number'
@@ -220,7 +238,7 @@ function App() {
             </button>
           ) : (
             <div className='flex justify-center items-center gap-4'>
-              <p className='font-bold text-xl'>{`You scored ${correct}/5 correct answers`}</p>
+              <p className='font-bold text-xl'>{`You scored ${correct}/${formData.amount} correct answers`}</p>
               <button
                 onClick={newGame}
                 className='bg-[#4D5B9E] p-3 rounded-xl mt-8 text-white cursor-pointer mb-8'
